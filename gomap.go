@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"sort"
@@ -56,6 +57,8 @@ func worker(portsChan <-chan int, resultsChan chan<- int, mode string, ipAddr st
 
 // Main parses command line flags and determines what mode, IP and port numbers are to be scanned
 func main() {
+	start := time.Now()
+
 	fmt.Print(banner)
 
 	// Variables to hold command line flags
@@ -67,11 +70,11 @@ func main() {
 	var showHelp bool
 	var workers int64
 
-	// Set up command line flags. Defaults to TCP scan if unspecified
+	// Assign command line flags tp variables. Defaults to TCP scan if unspecified, with 5000 worker functions running as goroutines
 	flag.StringVar(&mode, "s", "tcp", "Scan mode (udp|tcp)")
 	flag.StringVar(&ipAddr, "ip", "", "IP Address to scan")
 	flag.StringVar(&ports, "p", "", "Ports to scan")
-	flag.Int64Var(&workers, "w", 1000, "Number of worker functions to run")
+	flag.Int64Var(&workers, "w", 5000, "Number of worker functions to run")
 	flag.BoolVar(&showHelp, "h", false, "Show available flags")
 	flag.Parse()
 
@@ -80,7 +83,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Parse and format ports received
+	// Parse and format port ranges received
 	if ports == "-" {
 		for i := 1; i <= 65535; i++ {
 			portRange = append(portRange, i)
@@ -92,12 +95,12 @@ func main() {
 				rangeParts := strings.Split(portStr, "-")
 				start, err := strconv.Atoi(rangeParts[0])
 				if err != nil {
-					fmt.Println("Invalid starting port")
+					log.Panic("Invalid starting port")
 				}
 
 				end, err := strconv.Atoi(rangeParts[1])
 				if err != nil {
-					fmt.Println("Invalid ending port")
+					log.Panic("Invalid ending port")
 				}
 
 				for i := start; i <= end; i++ {
@@ -106,7 +109,7 @@ func main() {
 			} else {
 				port, err := strconv.Atoi(portStr)
 				if err != nil {
-					fmt.Println("Invalid port number given")
+					log.Panic("Invalid port number given")
 				}
 				portRange = append(portRange, port)
 			}
@@ -118,18 +121,19 @@ func main() {
 	portsChan := make(chan int, workers)
 	resultsChan := make(chan int)
 
+	// Initialise worker functions
 	for i := 0; i <= cap(portsChan); i++ {
 		go worker(portsChan, resultsChan, mode, ipAddr)
 	}
 
+	// Send ports to be scanned to the worker functions via channel portChan
 	go func() {
 		for _, port := range portRange {
 			portsChan <- port
 		}
 	}()
 
-	start := time.Now()
-
+	// Wait for results to be received from the resultsChan
 	for i := 1; i <= len(portRange); i++ {
 		port := <-resultsChan
 		if port != 0 {
