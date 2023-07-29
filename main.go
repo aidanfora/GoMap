@@ -134,9 +134,9 @@ func main() {
 	for _, port := range openPorts {
 		serviceName, exists := detailedlist[port]
 		if exists {
-			fmt.Printf("%-5d | Service/Protocol: %s\n", port, serviceName)
+			fmt.Printf("%-5d | %s\n", port, serviceName)
 		} else {
-			fmt.Printf("%-5d | Service/Protocol: Unknown\n", port)
+			fmt.Printf("%-5d | Unknown\n", port)
 		}
 	}
 
