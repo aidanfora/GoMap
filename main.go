@@ -28,8 +28,6 @@ const banner string = `
 func printMenu() {
 	fmt.Println(`
 	Flags:
-	-s  syn|con		Indicate the scanning mode. 
-				SYN scans on localhost only, and it might crash your PC if you scan too many ports.
 	-ip <IP_Address>	Indicate the IP Address to be scanned
 	-p  <Port Numbers>	Indicate the ports to be scanned 
 				Can be specified as a range or as individual ports
@@ -50,14 +48,12 @@ func main() {
 	// Variables to hold command line flags
 	var openPorts []int
 	var portRange []int
-	var mode string
 	var ipAddr string
 	var ports string
 	var workNum int64
 	var showHelp bool
 
 	// Assign command line flags tp variables. Defaults to TCP scan if unspecified, with 5000 worker functions running as goroutines
-	flag.StringVar(&mode, "s", "con", "Scanning mode (syn|con)")
 	flag.StringVar(&ipAddr, "ip", "", "IP Address to scan")
 	flag.StringVar(&ports, "p", "", "Ports to scan")
 	flag.Int64Var(&workNum, "w", 5000, "Number of worker functions to run")
@@ -104,24 +100,15 @@ func main() {
 			}
 		}
 	}
-	fmt.Printf("Scan Mode: %s | IP Address: %s | Total Ports: %s | Workers Running: %s\n\n", mode, ipAddr, fmt.Sprint(len(portRange)), fmt.Sprint(workNum))
+	fmt.Printf("Scan Mode: %s | IP Address: %s | Total Ports: %s | Workers Running: %s\n\n", "tcp", ipAddr, fmt.Sprint(len(portRange)), fmt.Sprint(workNum))
 
 	// Create two channels, one to send ports to the worker function, and one to receive results from it
 	portsChan := make(chan int, workNum)
 	resultsChan := make(chan int)
 
 	// Initialise worker functions
-	if mode == "syn" {
-		for i := 0; i <= cap(portsChan); i++ {
-			go workers.WorkerSyn(portsChan, resultsChan, ipAddr)
-		}
-	} else if mode == "con" {
-		for i := 0; i <= cap(portsChan); i++ {
-			go workers.WorkerCon(portsChan, resultsChan, ipAddr)
-		}
-	} else {
-		fmt.Println("Wrong scan mode specified")
-		return
+	for i := 0; i <= cap(portsChan); i++ {
+		go workers.Worker(portsChan, resultsChan, ipAddr)
 	}
 
 	// Send ports to be scanned to the worker functions via channel portChan
