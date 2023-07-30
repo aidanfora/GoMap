@@ -6,7 +6,7 @@ var detailedlist = map[int]string{
 	5938:  "teamviewer",
 	25565: "minecraft",
 	24800: "synergy",
-	//
+	// Standard Ports
 	1:     "Port Service Multiplexer",
 	2:     "Management Utility",
 	3:     "Compression Process",
