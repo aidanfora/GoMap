@@ -25,12 +25,12 @@ The `-h` option can be used for more information
 
 
         Flags:
-        -ip <IP_Address>        Indicate the IP Address to be scanned
-        -p  <Port Numbers>      Indicate the ports to be scanned 
+        -ip <IP Address>        Indicate the IP Address to be scanned
+        -p  <Port Numbers>      Indicate the ports to be scanned
                                 Can be specified as a range or as individual ports
         -w  <Worker Numbers>    Indicate the number of worker functions to be launched as goroutines
-                                An increase in number will result in decreased reliability of scans
+                                An increase in number above 15000 may result in decreased reliability of scans   
 
-        Example: Basic TCP Con Scan of the first 1024 ports on your localhost
-        .\gomap.exe -s con -ip 127.0.0.1 -p 1-1024
+        Example: Basic TCP Connect Scan of the first 1024 ports on your localhost
+        .\gomap.exe -ip 127.0.0.1 -p 1-1024
 ```
