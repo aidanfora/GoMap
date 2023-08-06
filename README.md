@@ -4,9 +4,9 @@ This is a repository for my mini project on developing a simple port scanner in 
 
 - Built in Go Version 1.20.6
 
-- Credits to [JustinTimperio's detailed list](https://github.com/JustinTimperio/gomap/blob/master/gomap_ports.go) of ports and their respective service/protocol names
-
 - Tested on Windows 11 OS
+
+- Credits to [JustinTimperio's detailed list](https://github.com/JustinTimperio/gomap/blob/master/gomap_ports.go) of ports and their respective service/protocol names
 
 ## Usage
 
